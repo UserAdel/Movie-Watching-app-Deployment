@@ -16,7 +16,7 @@ const app = express();
 const PORT = ENV_VARS.PORT;
 
 app.use(cors({
-	origin: "http://localhost:5173",
+	origin: "*",
 	credentials: true,
 }));
 
@@ -38,7 +38,23 @@ app.get("/", (req, res) => {
 
 
 
-app.listen(PORT, () => {
-	console.log("Server started at http://localhost:" + PORT);
-	connectDB();
+// Connect to database and start server
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Promise Rejection:', err);
+  process.exit(1);
 });
+
+// Start the server
+startServer();
